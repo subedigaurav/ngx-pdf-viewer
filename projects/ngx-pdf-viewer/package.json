@@ -1,0 +1,42 @@
+{
+  "name": "@subedigaurav/ngx-pdf-viewer",
+  "version": "0.0.1",
+  "description": "Headless PDF viewer library for Angular applications.",
+  "keywords": [
+    "angular",
+    "pdf",
+    "pdf-viewer",
+    "pdfjs",
+    "pdfjs-dist",
+    "angular-21"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subedigaurav/ngx-pdf-viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/subedigaurav/ngx-pdf-viewer/issues"
+  },
+  "homepage": "https://github.com/subedigaurav/ngx-pdf-viewer#readme",
+  "peerDependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "pdfjs-dist": "^5.4.0"
+  },
+  "peerDependenciesMeta": {
+    "pdfjs-dist": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

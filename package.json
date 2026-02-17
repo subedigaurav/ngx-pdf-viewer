@@ -1,0 +1,52 @@
+{
+  "name": "ngx-pdf-viewer",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build ngx-pdf-viewer",
+    "build:demo": "ng build ngx-pdf-demo",
+    "watch": "ng build ngx-pdf-viewer --watch --configuration development",
+    "test": "ng test ngx-pdf-viewer",
+    "dev": "ng build ngx-pdf-viewer && ng serve ngx-pdf-demo",
+    "start:demo": "ng build ngx-pdf-viewer && ng serve ngx-pdf-demo",
+    "demo": "ng serve ngx-pdf-demo",
+    "publish:lib": "pnpm run build && npm publish ./dist/ngx-pdf-viewer"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "pnpm@10.29.3",
+  "dependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/compiler": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/router": "^21.1.0",
+    "pdfjs-dist": "^5.4.624",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.4",
+    "@angular/cli": "^21.1.4",
+    "@angular/compiler-cli": "^21.1.0",
+    "concurrently": "^9.2.1",
+    "jsdom": "^27.1.0",
+    "ng-packagr": "^21.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8",
+    "zone.js": "^0.16.0"
+  }
+}

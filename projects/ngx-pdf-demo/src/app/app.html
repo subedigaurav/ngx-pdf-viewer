@@ -1,0 +1,282 @@
+<div class="app">
+  <header class="header">
+    <div class="header-brand">
+      <span class="logo">ngx-pdf-viewer</span>
+      <span class="badge">Demo</span>
+    </div>
+    <div class="header-actions">
+      <div class="url-input-wrap">
+        <input
+          type="url"
+          class="url-input"
+          [ngModel]="pdfSrc()"
+          (ngModelChange)="setPdfUrl($event)"
+          placeholder="PDF URL"
+          aria-label="PDF URL"
+        />
+        <button
+          type="button"
+          class="btn btn-ghost"
+          (click)="loadSamplePdf()"
+          aria-label="Load sample PDF"
+        >
+          Sample
+        </button>
+      </div>
+      <div class="status">
+        @if (progressPercent(); as pct) {
+          <span class="status-loading">Loading {{ pct }}%</span>
+        } @else if (error(); as err) {
+          <span class="status-error" role="alert">{{ err }}</span>
+        } @else {
+          <span class="status-pages">{{ pageInfo() }}</span>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn btn-icon"
+        (click)="toggleControls()"
+        [attr.aria-expanded]="controlsOpen()"
+        aria-label="Toggle controls panel"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="main">
+    @if (controlsOpen()) {
+      <aside class="controls" aria-label="Viewer controls">
+        <section class="control-group">
+          <h3 class="control-group-title">Navigation</h3>
+          <div class="control-row">
+            <label class="control-label">Page</label>
+            <div class="control-inline">
+              <button
+                type="button"
+                class="btn btn-sm"
+                (click)="goToPage(-1)"
+                [disabled]="numPages() === 0"
+                aria-label="Previous page"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                class="page-input"
+                [ngModel]="page()"
+                (ngModelChange)="page.set(+$event)"
+                min="1"
+                [max]="numPages() || 1"
+                aria-label="Current page"
+              />
+              <button
+                type="button"
+                class="btn btn-sm"
+                (click)="goToPage(1)"
+                [disabled]="numPages() === 0"
+                aria-label="Next page"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="control-group">
+          <h3 class="control-group-title">Zoom &amp; Scale</h3>
+          <div class="control-row">
+            <label class="control-label" for="zoom">Zoom</label>
+            <input
+              id="zoom"
+              type="range"
+              class="control-range"
+              [ngModel]="zoom()"
+              (ngModelChange)="zoom.set($event)"
+              min="0.5"
+              max="3"
+              step="0.1"
+              aria-valuemin="0.5"
+              aria-valuemax="3"
+              [attr.aria-valuenow]="zoom()"
+            />
+            <span class="control-value">{{ zoom() }}×</span>
+          </div>
+          <div class="control-row">
+            <label class="control-label" for="zoomScale">Scale mode</label>
+            <select
+              id="zoomScale"
+              class="control-select"
+              [ngModel]="zoomScale()"
+              (ngModelChange)="zoomScale.set($event)"
+            >
+              @for (opt of zoomScales; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="control-row">
+            <label class="control-label" for="rotation">Rotation</label>
+            <select
+              id="rotation"
+              class="control-select"
+              [ngModel]="rotation()"
+              (ngModelChange)="rotation.set(+$event)"
+            >
+              <option [value]="0">0°</option>
+              <option [value]="90">90°</option>
+              <option [value]="180">180°</option>
+              <option [value]="270">270°</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="control-group">
+          <h3 class="control-group-title">Display</h3>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="originalSize"
+              class="control-checkbox"
+              [ngModel]="originalSize()"
+              (ngModelChange)="originalSize.set($event)"
+            />
+            <label for="originalSize" class="control-check-label">Original size</label>
+          </div>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="fitToPage"
+              class="control-checkbox"
+              [ngModel]="fitToPage()"
+              (ngModelChange)="fitToPage.set($event)"
+            />
+            <label for="fitToPage" class="control-check-label">Fit to page</label>
+          </div>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="showBorders"
+              class="control-checkbox"
+              [ngModel]="showBorders()"
+              (ngModelChange)="showBorders.set($event)"
+            />
+            <label for="showBorders" class="control-check-label">Show borders</label>
+          </div>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="stickToPage"
+              class="control-checkbox"
+              [ngModel]="stickToPage()"
+              (ngModelChange)="stickToPage.set($event)"
+            />
+            <label for="stickToPage" class="control-check-label">Stick to page</label>
+          </div>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="enableHandTool"
+              class="control-checkbox"
+              [ngModel]="enableHandTool()"
+              (ngModelChange)="enableHandTool.set($event)"
+            />
+            <label for="enableHandTool" class="control-check-label">Hand tool (grab to pan)</label>
+          </div>
+        </section>
+
+        <section class="control-group">
+          <h3 class="control-group-title">Text layer</h3>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="renderText"
+              class="control-checkbox"
+              [ngModel]="renderText()"
+              (ngModelChange)="renderText.set($event)"
+            />
+            <label for="renderText" class="control-check-label">Render text</label>
+          </div>
+          @if (renderText()) {
+            <div class="control-row">
+              <label class="control-label" for="renderTextMode">Mode</label>
+              <select
+                id="renderTextMode"
+                class="control-select"
+                [ngModel]="renderTextMode()"
+                (ngModelChange)="renderTextMode.set($event)"
+              >
+                @for (opt of renderTextModes; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          }
+        </section>
+
+        <section class="control-group">
+          <h3 class="control-group-title">Behavior</h3>
+          <div class="control-row control-check">
+            <input
+              type="checkbox"
+              id="autoresize"
+              class="control-checkbox"
+              [ngModel]="autoresize()"
+              (ngModelChange)="autoresize.set($event)"
+            />
+            <label for="autoresize" class="control-check-label">Auto-resize</label>
+          </div>
+          <div class="control-row">
+            <label class="control-label" for="externalLinkTarget">Link target</label>
+            <select
+              id="externalLinkTarget"
+              class="control-select"
+              [ngModel]="externalLinkTarget()"
+              (ngModelChange)="externalLinkTarget.set($event)"
+            >
+              @for (opt of linkTargets; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </section>
+      </aside>
+    }
+
+    <main class="viewer-area">
+      <div class="viewer-wrapper">
+        <ngx-pdf-viewer
+          [src]="pdfSrc()"
+          [page]="page()"
+          [renderText]="renderText()"
+          [renderTextMode]="renderTextMode()"
+          [originalSize]="originalSize()"
+          [stickToPage]="stickToPage()"
+          [zoom]="zoom()"
+          [zoomScale]="zoomScale()"
+          [rotation]="rotation()"
+          [autoresize]="autoresize()"
+          [fitToPage]="fitToPage()"
+          [showBorders]="showBorders()"
+          [enableHandTool]="enableHandTool()"
+          [externalLinkTarget]="externalLinkTarget()"
+          (afterLoadComplete)="onLoadComplete($event)"
+          (pageChange)="onPageChange($event)"
+          (onProgress)="onProgress($event)"
+          (onError)="onError($event)"
+        />
+      </div>
+    </main>
+  </div>
+</div>
+<router-outlet />

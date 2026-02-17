@@ -1,0 +1,48 @@
+.ngx-pdf-viewer-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+:host {
+  display: block;
+  position: relative;
+  min-width: 0;
+  --pdfViewer-padding-bottom: 0;
+  --page-margin: 1px auto -8px;
+  --page-border: 9px solid transparent;
+  --spreadHorizontalWrapped-margin-LR: -3.5px;
+  --viewer-container-height: 0;
+  --scale-factor: 1;
+
+  @media screen and (forced-colors: active) {
+    --pdfViewer-padding-bottom: 9px;
+    --page-margin: 8px auto -1px;
+    --page-border: 1px solid CanvasText;
+  }
+}
+
+/* Hand tool cursor styles */
+.grab-to-pan-grab {
+  cursor: grab !important;
+
+  &:active {
+    cursor: grabbing !important;
+  }
+}
+
+.grab-to-pan-grabbing {
+  position: fixed;
+  background: transparent;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 50000;
+  cursor: grabbing !important;
+}
