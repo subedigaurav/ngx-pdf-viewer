@@ -1,6 +1,6 @@
 # ngx-pdf-viewer
 
-Headless PDF viewer library for angular applications.
+A lightweight PDF viewer library for angular applications.
 
 [![Angular](https://img.shields.io/badge/Angular-21+-DD0031?logo=angular)](https://angular.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
