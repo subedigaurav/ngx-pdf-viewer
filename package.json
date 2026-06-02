@@ -47,7 +47,7 @@
     "jsdom": "^27.1.0",
     "ng-packagr": "^21.1.0",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8",
+    "vitest": "^4.1.0",
     "zone.js": "^0.16.0"
   }
 }
