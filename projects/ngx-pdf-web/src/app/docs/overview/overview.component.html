@@ -1,0 +1,105 @@
+<article class="docs-page overview-docs">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/docs">Docs</a>
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-2xs">chevron_right</mat-icon>
+    <span aria-current="page">Overview</span>
+  </nav>
+
+  <header class="hero">
+    <span class="hero-badge">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">verified</mat-icon>
+      Angular 22 · PDF.js 6 · Standalone
+    </span>
+    <h1>ngx-pdf-viewer</h1>
+    <p class="lead">
+      A lightweight, type-safe PDF viewer for Angular — built on PDF.js with full control over styling, accessibility,
+      and behavior. No wrappers, no iframes.
+    </p>
+    <div class="hero-actions">
+      <a mat-flat-button routerLink="/docs/getting-started" class="cta-primary">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">rocket_launch</mat-icon>
+        Get started
+      </a>
+      <a mat-stroked-button routerLink="/demo" class="cta-secondary">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">play_circle</mat-icon>
+        Live demo
+      </a>
+      <a mat-stroked-button routerLink="/docs/api" class="cta-secondary"> API reference </a>
+    </div>
+  </header>
+
+  <section class="doc-section">
+    <h2>Why ngx-pdf-viewer?</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon"
+          ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-md">bolt</mat-icon></span
+        >
+        <h3>Lightweight &amp; fast</h3>
+        <p>Minimal dependencies, tree-shakable, and lazy-loaded via intersection observer.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon"
+          ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-md">shield</mat-icon></span
+        >
+        <h3>Type-safe</h3>
+        <p>Full TypeScript strict mode, typed inputs/outputs, and PDF.js types re-exported.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon"
+          ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-md">widgets</mat-icon></span
+        >
+        <h3>Standalone</h3>
+        <p>Built for modern Angular — no NgModules, signal inputs and outputs, OnPush throughout.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon"
+          ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-md">palette</mat-icon></span
+        >
+        <h3>Customizable</h3>
+        <p>Headless page rendering — bring your own toolbar and restyle every PDF.js layer.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon"
+          ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-md">search</mat-icon></span
+        >
+        <h3>Search &amp; outline</h3>
+        <p>Integrated find controller, thumbnail rendering, and outline extraction APIs.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon"
+          ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-md"
+            >accessibility</mat-icon
+          ></span
+        >
+        <h3>Accessible by design</h3>
+        <p>
+          The viewer renders a real text layer and marks its container
+          <code>aria-busy</code> while loading — the toolbar is yours, so its ARIA is yours too.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section next-steps">
+    <h2>Next steps</h2>
+    <div class="next-grid">
+      <a routerLink="/docs/getting-started" class="next-card">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-lg">menu_book</mat-icon>
+        <div>
+          <strong>Installation</strong>
+          <span>Install the package and render your first PDF.</span>
+        </div>
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_forward</mat-icon>
+      </a>
+      <a routerLink="/docs/api" class="next-card">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-lg">code</mat-icon>
+        <div>
+          <strong>API reference</strong>
+          <span>Inputs, outputs, and imperative methods for full control.</span>
+        </div>
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_forward</mat-icon>
+      </a>
+    </div>
+  </section>
+</article>

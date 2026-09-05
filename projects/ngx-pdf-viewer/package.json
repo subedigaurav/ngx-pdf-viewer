@@ -1,0 +1,35 @@
+{
+  "name": "@gavsby/ngx-pdf-viewer",
+  "version": "1.0.0",
+  "description": "Headless, signal-based PDF viewer component for Angular powered by PDF.js.",
+  "keywords": [
+    "angular",
+    "pdf",
+    "pdf viewer",
+    "pdfjs",
+    "angular pdf viewer"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subedigaurav/ngx-pdf-viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/subedigaurav/ngx-pdf-viewer/issues"
+  },
+  "homepage": "https://subedigaurav.github.io/ngx-pdf-viewer",
+  "peerDependencies": {
+    "@angular/common": "^21.1.0 || ^22.0.0",
+    "@angular/core": "^21.1.0 || ^22.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

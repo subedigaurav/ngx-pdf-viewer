@@ -1,0 +1,407 @@
+<article class="docs-page api-docs" ngxHighlightCode>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/docs">Docs</a>
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-2xs">chevron_right</mat-icon>
+    <span aria-current="page">API Reference</span>
+  </nav>
+
+  <header class="doc-hero">
+    <h1>API Reference</h1>
+    <p class="lead">
+      Inputs, outputs, methods, and configuration for the standalone
+      <code>PdfViewerComponent</code>.
+    </p>
+  </header>
+
+  <section class="doc-section" id="pdf-viewer-component">
+    <h2>PdfViewerComponent</h2>
+    <p class="section-intro">
+      Standalone component that renders a PDF document. Import it directly — no modules required.
+    </p>
+
+    <div ngTabs>
+      <ul ngTabList [selectedTab]="apiTab()" (selectedTabChange)="apiTab.set($event ?? 'inputs')" class="tab-list">
+        <li ngTab value="inputs" class="tab-btn">Inputs</li>
+        <li ngTab value="outputs" class="tab-btn">Outputs</li>
+        <li ngTab value="methods" class="tab-btn">Methods</li>
+      </ul>
+
+      <div ngTabPanel value="inputs">
+        <ng-template ngTabContent>
+          <h3>Inputs</h3>
+          <div class="table-wrap">
+            <table class="api-table">
+              <thead>
+                <tr>
+                  <th>Input</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>src</code></td>
+                  <td>string | Uint8Array | PDFSource</td>
+                  <td>&mdash;</td>
+                  <td>
+                    PDF source — see
+                    <a routerLink="/docs/getting-started" fragment="sources">supported source types</a>
+                    (URL, bytes, base64, Blob, or a document parameters object)
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>page</code></td>
+                  <td>number</td>
+                  <td>1</td>
+                  <td>Current page number</td>
+                </tr>
+                <tr>
+                  <td><code>renderText</code></td>
+                  <td>boolean</td>
+                  <td>true</td>
+                  <td>Enable text layer</td>
+                </tr>
+                <tr>
+                  <td><code>renderTextMode</code></td>
+                  <td>RenderTextMode</td>
+                  <td>ENABLED</td>
+                  <td>Text layer mode</td>
+                </tr>
+                <tr>
+                  <td><code>originalSize</code></td>
+                  <td>boolean</td>
+                  <td>false</td>
+                  <td>Render at original page size instead of fitting</td>
+                </tr>
+                <tr>
+                  <td><code>stickToPage</code></td>
+                  <td>boolean</td>
+                  <td>false</td>
+                  <td>Keep scale changes anchored to current page</td>
+                </tr>
+                <tr>
+                  <td><code>zoom</code></td>
+                  <td>number</td>
+                  <td>1</td>
+                  <td>Zoom multiplier</td>
+                </tr>
+                <tr>
+                  <td><code>zoomScale</code></td>
+                  <td>'page-width' | 'page-height' | 'page-fit'</td>
+                  <td>'page-width'</td>
+                  <td>Scale mode</td>
+                </tr>
+                <tr>
+                  <td><code>rotation</code></td>
+                  <td>number</td>
+                  <td>0</td>
+                  <td>Page rotation (0, 90, 180, 270)</td>
+                </tr>
+                <tr>
+                  <td><code>autoresize</code></td>
+                  <td>boolean</td>
+                  <td>true</td>
+                  <td>Re-render on container/window resize</td>
+                </tr>
+                <tr>
+                  <td><code>fitToPage</code></td>
+                  <td>boolean</td>
+                  <td>true</td>
+                  <td>Fit content to container</td>
+                </tr>
+                <tr>
+                  <td><code>showBorders</code></td>
+                  <td>boolean</td>
+                  <td>false</td>
+                  <td>Show page borders</td>
+                </tr>
+                <tr>
+                  <td><code>cMapsUrl</code></td>
+                  <td>string | null</td>
+                  <td>null</td>
+                  <td>CMap URL for CJK text; null falls back to the CDN default</td>
+                </tr>
+                <tr>
+                  <td><code>externalLinkTarget</code></td>
+                  <td>'blank' | 'self' | 'parent' | 'top' | 'none'</td>
+                  <td>'blank'</td>
+                  <td>Target for external URLs</td>
+                </tr>
+                <tr>
+                  <td><code>enableHandTool</code></td>
+                  <td>boolean</td>
+                  <td>config, else false</td>
+                  <td>Enable pan/drag hand tool; unbound falls back to providePdfViewerConfig</td>
+                </tr>
+                <tr>
+                  <td><code>annotationMode</code></td>
+                  <td>AnnotationDisplayMode</td>
+                  <td>'enabled'</td>
+                  <td>Annotation display mode: 'none' | 'enabled' | 'forms' | 'storage'</td>
+                </tr>
+                <tr>
+                  <td><code>locale</code></td>
+                  <td>string</td>
+                  <td>'en'</td>
+                  <td>Locale for PDF.js localization</td>
+                </tr>
+                <tr>
+                  <td><code>loadingTemplate</code></td>
+                  <td>TemplateRef | null</td>
+                  <td>null</td>
+                  <td>Custom loading overlay while the document is fetched</td>
+                </tr>
+                <tr>
+                  <td><code>passwordProvider</code></td>
+                  <td>(reason: number) =&gt; Promise&lt;string | null&gt;</td>
+                  <td>&mdash;</td>
+                  <td>
+                    Async password prompt for encrypted documents; reason is a pdf.js PasswordResponses code (1 =
+                    NEED_PASSWORD, 2 = INCORRECT_PASSWORD); return null to cancel
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-template>
+      </div>
+
+      <div ngTabPanel value="outputs">
+        <ng-template ngTabContent>
+          <h3>Outputs</h3>
+          <div class="table-wrap">
+            <table class="api-table">
+              <thead>
+                <tr>
+                  <th>Output</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>afterLoadComplete</code></td>
+                  <td>PDFDocumentProxy</td>
+                  <td>Emitted when PDF is loaded</td>
+                </tr>
+                <tr>
+                  <td><code>pageRendered</code></td>
+                  <td>CustomEvent</td>
+                  <td>A page has been rendered</td>
+                </tr>
+                <tr>
+                  <td><code>pagesInitialized</code></td>
+                  <td>CustomEvent</td>
+                  <td>All pages have been initialized</td>
+                </tr>
+                <tr>
+                  <td><code>textLayerRendered</code></td>
+                  <td>CustomEvent</td>
+                  <td>A text layer has been rendered</td>
+                </tr>
+                <tr>
+                  <td><code>pageChange</code></td>
+                  <td>number</td>
+                  <td>Emitted when visible page changes</td>
+                </tr>
+                <tr>
+                  <td><code>outlineLoaded</code></td>
+                  <td>PDFOutlineItem[]</td>
+                  <td>Document outline after load</td>
+                </tr>
+                <tr>
+                  <td><code>progress</code></td>
+                  <td>PDFProgressData</td>
+                  <td>Loading progress (loaded / total bytes)</td>
+                </tr>
+                <tr>
+                  <td><code>error</code></td>
+                  <td>PdfViewerError</td>
+                  <td>
+                    Load/render error — branch on err.code (LOAD_FAILED, PASSWORD_REQUIRED, PASSWORD_CANCELLED,
+                    INVALID_SOURCE, INVALID_STATE, RENDER_FAILED)
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>searchResults</code></td>
+                  <td>PdfSearchMatches | null</td>
+                  <td>Emitted when search completes or is cleared</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-template>
+      </div>
+
+      <div ngTabPanel value="methods">
+        <ng-template ngTabContent>
+          <h3>Methods</h3>
+          <div class="table-wrap">
+            <table class="api-table">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Signature</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>search</code></td>
+                  <td>(query: string, options?: SearchOptions): void</td>
+                  <td>Search via the pdf.js find controller</td>
+                </tr>
+                <tr>
+                  <td><code>clearSearch</code></td>
+                  <td>(): void</td>
+                  <td>Clear active search and highlights</td>
+                </tr>
+                <tr>
+                  <td><code>findNext</code></td>
+                  <td>(): void</td>
+                  <td>Navigate to next search match</td>
+                </tr>
+                <tr>
+                  <td><code>findPrevious</code></td>
+                  <td>(): void</td>
+                  <td>Navigate to previous search match</td>
+                </tr>
+                <tr>
+                  <td><code>getOutline</code></td>
+                  <td>(): Promise&lt;PDFOutlineItem[]&gt;</td>
+                  <td>Document outline (empty array when none)</td>
+                </tr>
+                <tr>
+                  <td><code>getThumbnail</code></td>
+                  <td>(page: number): Promise&lt;ThumbnailData&gt;</td>
+                  <td>Thumbnail for a page (max width 150px)</td>
+                </tr>
+                <tr>
+                  <td><code>download</code></td>
+                  <td>(filename?: string): Promise&lt;void&gt;</td>
+                  <td>Download raw bytes as a PDF file</td>
+                </tr>
+                <tr>
+                  <td><code>print</code></td>
+                  <td>(): Promise&lt;void&gt;</td>
+                  <td>Print via a hidden iframe</td>
+                </tr>
+                <tr>
+                  <td><code>getMetadata</code></td>
+                  <td>(): Promise&lt;PDFDocumentMetadata&gt;</td>
+                  <td>Embedded document metadata</td>
+                </tr>
+                <tr>
+                  <td><code>navigateToOutline</code></td>
+                  <td>(item: PDFOutlineItem): void</td>
+                  <td>Navigate to an outline / table-of-contents entry</td>
+                </tr>
+                <tr>
+                  <td><code>getPageCount</code></td>
+                  <td>(): number</td>
+                  <td>Number of pages (0 when none loaded)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section" id="provide-pdf-viewer-config">
+    <h2>providePdfViewerConfig</h2>
+    <p>
+      Provider to configure the viewer globally:
+      <code
+        >{{ '{' }} cdnBaseUrl?, workerSrc?, cMapsUrl?, standardFontDataUrl?, wasmUrl?, iccUrl?, imageResourcesPath?,
+        enableHandTool?, maxCanvasPixels? {{ '}' }}</code
+      >. pdf.js loads from a CDN by default — worker, cMaps, standard fonts, WebAssembly image decoders and the CMYK ICC
+      profile are all resolved automatically. Override individual URLs to self-host, or <code>cdnBaseUrl</code> to point
+      at a different CDN entirely.
+    </p>
+    <div class="code-block">
+      <div class="code-head"><span>Example</span></div>
+      <pre><code class="language-typescript">providePdfViewerConfig(&#123;
+  cdnBaseUrl: 'https://unpkg.com/pdfjs-dist&#64;6.3.289/',
+  enableHandTool: true,
+&#125;)</code></pre>
+    </div>
+    <div class="callout">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">info</mat-icon>
+      <div>
+        <strong>maxCanvasPixels — usually leave it unset</strong>
+        <span>
+          pdf.js already picks a platform-aware cap: <code>2**25</code> (33,554,432px) on desktop, and 5,242,880px on
+          iOS/Android where canvas memory is scarce. Past the cap it renders at a lower effective pixel ratio rather
+          than allocating. Overriding raises the mobile cap too — and one page canvas at page-width zoom on a HiDPI
+          display is already about 25&nbsp;MB, with up to 10 kept buffered. Raise it only for a measured sharpness
+          problem at high zoom.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section" id="errors">
+    <h2>Errors</h2>
+    <p class="section-intro">
+      Failures reach you through the <code>error</code> output as a <code>PdfViewerError</code> carrying a stable
+      <code>code</code> plus the original <code>cause</code>.
+    </p>
+    <div class="table-wrap">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Raised when</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>INVALID_SOURCE</code></td>
+            <td><code>src</code> is empty or not a recognised source shape.</td>
+          </tr>
+          <tr>
+            <td><code>LOAD_FAILED</code></td>
+            <td>Network, CORS, or a malformed/corrupt PDF.</td>
+          </tr>
+          <tr>
+            <td><code>PASSWORD_REQUIRED</code></td>
+            <td>Encrypted PDF and no <code>passwordProvider</code> bound.</td>
+          </tr>
+          <tr>
+            <td><code>PASSWORD_CANCELLED</code></td>
+            <td>The provider returned <code>null</code> or threw.</td>
+          </tr>
+          <tr>
+            <td><code>INVALID_STATE</code></td>
+            <td>A document method ran before a document finished loading.</td>
+          </tr>
+          <tr>
+            <td><code>RENDER_FAILED</code></td>
+            <td>PDF.js failed while rasterising or scaling a page.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">warning</mat-icon>
+      <div>
+        <strong>Document methods throw before load</strong>
+        <span>
+          <code>getOutline</code>, <code>getMetadata</code>, <code>getThumbnail</code>, <code>download</code> and
+          <code>print</code> reject with <code>INVALID_STATE</code> if no document is loaded.
+          <code>getPageCount()</code> returns <code>0</code> instead of throwing, so it is the safe guard.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <nav class="doc-nav">
+    <a mat-stroked-button routerLink="/docs/getting-started" class="doc-nav-link doc-nav-prev">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_back</mat-icon> Getting
+      Started
+    </a>
+  </nav>
+</article>

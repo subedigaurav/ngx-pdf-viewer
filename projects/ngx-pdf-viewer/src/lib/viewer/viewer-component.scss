@@ -1,0 +1,80 @@
+.ngx-pdf-viewer-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: auto;
+}
+
+.pdf-viewer-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: var(--mat-sys-on-surface-variant);
+  background: color-mix(in srgb, var(--mat-sys-surface) 86%, transparent);
+  backdrop-filter: blur(2px);
+  font: 500 0.8125rem/1.5 var(--ds-font-mono, 'JetBrains Mono', monospace);
+  letter-spacing: 0.02em;
+}
+
+:host {
+  display: block;
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  --pdfViewer-padding-bottom: 16px;
+  --page-margin: 12px auto;
+  --page-border: 1px solid transparent;
+  --spreadHorizontalWrapped-margin-LR: -3.5px;
+  --viewer-container-height: 0;
+  --scale-factor: 1;
+
+  @media screen and (forced-colors: active) {
+    --pdfViewer-padding-bottom: 9px;
+    --page-margin: 8px auto -1px;
+    --page-border: 1px solid CanvasText;
+  }
+}
+
+// ── Search highlight — primary yellow, secondary purple ──────────────
+// PDF.js defaults: purple (180 0 170 / 0.25) for all hits, green for current.
+// Spec: primary (selected/current) = yellow highlighter, secondary (other hits) = purple.
+:host ::ng-deep .textLayer .highlight {
+  --highlight-bg-color: rgb(180 0 170 / 0.25);
+  --highlight-selected-bg-color: rgb(255 235 59 / 0.5);
+  --highlight-backdrop-filter: none;
+  --highlight-selected-backdrop-filter: none;
+}
+
+:host ::ng-deep .textLayer .highlight.selected {
+  box-shadow: 0 0 0 1px rgb(255 235 59 / 0.45) inset;
+}
+
+/* Hand tool cursor styles */
+.grab-to-pan-grab {
+  cursor: grab !important;
+
+  &:active {
+    cursor: grabbing !important;
+  }
+}
+
+.grab-to-pan-grabbing {
+  position: fixed;
+  background: transparent;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 50000;
+  cursor: grabbing !important;
+}

@@ -1,0 +1,935 @@
+@import 'tailwindcss';
+
+/* Design tokens: a warm paper/ink neutral scale with one near-black accent. */
+@theme {
+  /* Neutrals — warm, paper-toned, not the stock cool Material gray.
+     Kept comfortably above WCAG AA (muted ~6.9:1, stone/outline visibly
+     separated from paper). */
+  --color-paper: #faf9f5;
+  --color-surface: #ffffff;
+  --color-surface-container-low: #f6f4ee;
+  --color-surface-container: #f1efe7;
+  --color-surface-container-high: #e8e5da;
+  --color-background: #efece2;
+  --color-viewer: #ddd8ca;
+  --color-ink: #1c1a16;
+  --color-muted: #5b5648;
+  --color-stone: #ded7c8;
+  --color-outline: #bfb6a0;
+
+  /* Accent — near-black, used for links, focus, and active state. A hair
+     lighter than --color-ink so it reads as an accent, not just body text. */
+  --color-signal: #26241e;
+  --color-signal-on: #ffffff;
+  --color-secondary-container: #e6e2d4;
+  --color-secondary-on-container: #26241e;
+
+  /* Status */
+  --color-error: #b3261e;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(28, 26, 22, 0.06), 0 1px 3px rgba(28, 26, 22, 0.08);
+  --shadow-md: 0 4px 12px rgba(28, 26, 22, 0.08), 0 1px 4px rgba(28, 26, 22, 0.06);
+  --shadow-lg: 0 8px 28px rgba(28, 26, 22, 0.12);
+}
+
+@layer base {
+  html {
+    height: 100%;
+    scroll-behavior: smooth;
+    color-scheme: light;
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html {
+      color-scheme: dark;
+    }
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  code,
+  pre,
+  kbd {
+    font-family: var(--font-mono);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* PDF.js viewer skin. The library injects pdf_viewer.css before these rules,
+   so they still win on specificity. Kept unlayered because layered rules
+   can't beat pdf.js's unlayered stylesheet. */
+.pdfViewer {
+  --page-border: 1px solid rgba(17, 20, 24, 0.12);
+}
+
+.pdfViewer .page {
+  border-radius: 2px;
+  box-shadow:
+    0 1px 3px rgba(17, 20, 24, 0.08),
+    0 4px 12px rgba(17, 20, 24, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pdfViewer {
+    --page-bg-color: #1a1c1e;
+    --page-border: 1px solid rgba(232, 234, 237, 0.12);
+  }
+
+  .pdfViewer .page {
+    box-shadow:
+      0 1px 3px rgba(232, 234, 237, 0.07),
+      0 4px 12px rgba(232, 234, 237, 0.07);
+  }
+}
+
+/* Search highlights: purple for other hits, yellow for the current match. */
+.textLayer .highlight {
+  --highlight-bg-color: rgb(180 0 170 / 0.25);
+  --highlight-selected-bg-color: rgb(255 235 59 / 0.5);
+  --highlight-backdrop-filter: none;
+  --highlight-selected-backdrop-filter: none;
+}
+
+.textLayer .highlight.selected {
+  box-shadow: 0 0 0 1px rgb(255 235 59 / 0.45) inset;
+}
+
+/* Long-form docs pages. Interactive chrome is styled inline with Tailwind. */
+@layer components {
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 2rem;
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+  .breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .breadcrumb a:hover {
+    color: var(--color-ink);
+  }
+  .breadcrumb a:focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .breadcrumb mat-icon {
+    opacity: 0.6;
+  }
+  .breadcrumb [aria-current='page'] {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  /* Signature element: a rotated, hand-stamped registration mark — this
+     site's subject is documents, so the hero badge borrows the mark a
+     librarian's date-due stamp leaves on a title page. */
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    padding: 0.4rem 0.8rem;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    transform: rotate(-1.75deg);
+  }
+  .hero,
+  .doc-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    padding-bottom: 2.25rem;
+    margin-bottom: 2.75rem;
+    border-bottom: 1px solid var(--color-stone);
+  }
+  .hero h1,
+  .doc-hero h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .hero h1 {
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    line-height: 1.05;
+  }
+  .doc-hero h1 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    line-height: 1.1;
+  }
+  .lead {
+    max-width: 62ch;
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  .cta-primary,
+  .cta-secondary {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em;
+  }
+
+  .doc-section {
+    margin-bottom: 3.25rem;
+  }
+  .doc-section:last-child {
+    margin-bottom: 0;
+  }
+  .doc-section h2 {
+    margin: 0 0 0.875rem;
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .doc-section h3 {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .doc-section h3:first-child {
+    margin-top: 0;
+  }
+  .doc-section p {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-ink);
+  }
+  .doc-section p:last-child {
+    margin-bottom: 0;
+  }
+  .doc-section p.section-intro {
+    font-size: 1rem;
+    color: var(--color-muted);
+    margin-bottom: 1.5rem;
+  }
+  .doc-section p.muted {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+  .doc-section a {
+    color: var(--color-ink);
+    text-underline-offset: 2px;
+    text-decoration-color: var(--color-outline);
+  }
+  .doc-section a:hover {
+    text-decoration-color: var(--color-ink);
+  }
+  .doc-section a:focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.625rem;
+    border-radius: var(--radius-full);
+    background: var(--color-signal);
+    color: var(--color-signal-on);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+
+  .docs-page code {
+    padding: 0.15em 0.4em;
+    border: 1px solid var(--color-stone);
+    border-radius: 4px;
+    background: var(--color-surface-container);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--color-stone);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .feature-card:hover {
+    border-color: var(--color-outline);
+    box-shadow: var(--shadow-sm);
+  }
+  .feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: var(--radius-md);
+    background: var(--color-secondary-container);
+    color: var(--color-secondary-on-container);
+  }
+  .feature-card h3 {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .feature-card p {
+    margin: 0;
+    font-size: 0.8438rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .next-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .next-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--color-stone);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .next-card:hover {
+    border-color: var(--color-signal);
+    box-shadow: var(--shadow-sm);
+  }
+  .next-card:focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+  .next-card > mat-icon:first-child {
+    flex-shrink: 0;
+    color: var(--color-signal);
+  }
+  .next-card > mat-icon:last-child {
+    flex-shrink: 0;
+    margin-left: auto;
+    color: var(--color-muted);
+    transition:
+      transform 0.15s ease,
+      color 0.15s ease;
+  }
+  .next-card:hover > mat-icon:last-child {
+    color: var(--color-ink);
+    transform: translateX(2px);
+  }
+  .next-card strong {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .next-card span {
+    display: block;
+    margin-top: 0.125rem;
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .code-block {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--color-ink);
+    box-shadow: var(--shadow-sm);
+  }
+  .code-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.55);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .code-block pre {
+    margin: 0;
+    padding: 1rem 1.125rem 1.25rem;
+    overflow-x: auto;
+  }
+  .code-block code {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    color: #f3f1ea;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+
+  /* Prism token colors, hand-picked to sit on the --color-ink code card
+     instead of pulling in a full theme with its own (mismatched) background. */
+  .code-block .token.comment {
+    color: #8a8371;
+    font-style: italic;
+  }
+  .code-block .token.punctuation,
+  .code-block .token.operator {
+    color: #a89f8c;
+  }
+  .code-block .token.keyword,
+  .code-block .token.atrule {
+    color: #d98f6c;
+  }
+  .code-block .token.string,
+  .code-block .token.template-string,
+  .code-block .token.char {
+    color: #a8c08a;
+  }
+  .code-block .token.function,
+  .code-block .token.class-name {
+    color: #e0b45c;
+  }
+  .code-block .token.number,
+  .code-block .token.boolean,
+  .code-block .token.constant {
+    color: #c9a97e;
+  }
+  .code-block .token.property,
+  .code-block .token.parameter,
+  .code-block .token.builtin {
+    color: #cdbfa0;
+  }
+
+  .callout {
+    display: flex;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--color-stone);
+    border-left: 3px solid var(--color-signal);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-container-low);
+  }
+  .callout mat-icon {
+    flex-shrink: 0;
+    margin-top: 0.0625rem;
+    color: var(--color-signal);
+  }
+  .callout strong {
+    display: block;
+    margin-bottom: 0.125rem;
+    font-size: 0.8438rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .callout span {
+    font-size: 0.8438rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1.25rem 0;
+    border: 1px solid var(--color-stone);
+    border-radius: var(--radius-md);
+  }
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8438rem;
+  }
+  .api-table th {
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--color-stone);
+    background: var(--color-surface-container);
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .api-table td {
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--color-stone);
+    color: var(--color-ink);
+    vertical-align: top;
+  }
+  .api-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .accordion-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+  .accordion-item {
+    overflow: hidden;
+    border: 1px solid var(--color-stone);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.875rem 1.125rem;
+    border: none;
+    background: none;
+    color: var(--color-ink);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+  .accordion-header:hover {
+    background: var(--color-surface-container-low);
+  }
+  .accordion-header:focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: -2px;
+  }
+  .accordion-header .icon {
+    flex-shrink: 0;
+    color: var(--color-muted);
+    transition: transform 0.15s ease;
+  }
+  .accordion-header[aria-expanded='true'] .icon {
+    transform: rotate(180deg);
+  }
+  .accordion-panel {
+    padding: 0 1.125rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+
+  .tab-list {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--color-stone);
+  }
+  .tab-btn {
+    margin-bottom: -1px;
+    padding: 0.5rem 0.875rem;
+    border-bottom: 2px solid transparent;
+    color: var(--color-muted);
+    font-size: 0.8438rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .tab-btn:hover {
+    color: var(--color-ink);
+  }
+  .tab-btn:focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+  .tab-btn[aria-selected='true'] {
+    color: var(--color-ink);
+    font-weight: 600;
+    border-bottom-color: var(--color-signal);
+  }
+
+  /* Features page: a scannable checklist. The green-ish check marker is the
+     only place the palette leaves monochrome — it earns it by letting you skim
+     "what's in the box" without reading. */
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0 0 0.5rem;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--color-stone);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .feature-list li {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    column-gap: 0.75rem;
+    padding: 0.875rem 1.125rem;
+    border-top: 1px solid var(--color-stone);
+  }
+  .feature-list li:first-child {
+    border-top: none;
+  }
+  .feature-list li::before {
+    content: '';
+    grid-row: span 2;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.125rem;
+    border-radius: var(--radius-full);
+    background: linear-gradient(transparent, transparent), var(--color-secondary-container);
+    box-shadow: inset 0 0 0 1px var(--color-outline);
+    /* check glyph */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2326241e' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-size: 0.75rem;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .feature-list strong {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    line-height: 1.45;
+  }
+  .feature-list span {
+    grid-column: 2;
+    margin-top: 0.1875rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  /* Scope/limitations list on the Features page: a plain list reads as filler
+     next to the API tables, so give each item a marker that says "boundary". */
+  .scope-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .scope-list li {
+    position: relative;
+    padding: 0.875rem 1rem 0.875rem 2.5rem;
+    border: 1px solid var(--color-stone);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+  .scope-list li::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 1.35rem;
+    width: 0.75rem;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--color-outline);
+  }
+  .scope-list strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .doc-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-stone);
+  }
+  .doc-nav-link {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ── Angular Material overrides ──────────────────────────────────────────
+   Material ships its component CSS unlayered, and unlayered rules always beat
+   anything inside a Tailwind @layer regardless of specificity. So Tailwind
+   utilities on a Material element are silently dropped whenever they collide.
+   Everything below is therefore unlayered, and drives Material's own tokens
+   rather than fighting them. */
+
+/* mat-icon hard-codes 24px, so text-* utilities can't size it. */
+.icon-2xs {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+}
+.icon-xs {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+}
+.icon-sm {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  line-height: 18px !important;
+}
+.icon-md {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+}
+.icon-lg {
+  font-size: 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  line-height: 22px !important;
+}
+
+/* Material sets display:block, which leaves small icons off-centre. */
+button.mat-mdc-icon-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Filled/outlined buttons: Material owns height, padding, shape and weight. */
+.tb-action.mat-mdc-button-base {
+  --mat-button-filled-container-height: 32px;
+  --mat-button-filled-horizontal-padding: 16px;
+  --mat-button-filled-container-shape: var(--radius-sm);
+  --mat-button-filled-label-text-size: 0.875rem;
+  --mat-button-filled-label-text-weight: 600;
+  --mat-button-outlined-container-height: 32px;
+  --mat-button-outlined-horizontal-padding: 16px;
+  --mat-button-outlined-container-shape: var(--radius-sm);
+  --mat-button-outlined-label-text-size: 0.875rem;
+  --mat-button-outlined-label-text-weight: 600;
+  --mat-button-outlined-outline-color: var(--color-outline);
+  min-width: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Icon buttons: Material owns size, shape and background. */
+.tb-btn.mat-mdc-icon-button {
+  --mat-icon-button-state-layer-size: 32px;
+  --mat-icon-button-icon-size: 18px;
+  --mat-icon-button-container-shape: var(--radius-sm);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+/* Ring is --color-muted, not --color-outline: the fill alone is 1.13:1 against
+   the group background, under the 3:1 WCAG 1.4.11 asks of a state indicator. */
+.tb-btn.mat-mdc-icon-button[aria-pressed='true'] {
+  background-color: var(--color-secondary-container);
+  color: var(--color-secondary-on-container);
+  box-shadow: inset 0 0 0 1px var(--color-muted);
+}
+
+/* MatTooltip has no "no animation" input, but the component reads the computed
+   animation-duration and finalizes synchronously when it is 0s. */
+.mat-mdc-tooltip {
+  animation-duration: 0s !important;
+}
+
+/* ── App chrome ──────────────────────────────────────────────────────────── */
+
+/* Primary nav: a segmented control, so the two destinations read as one
+   switch with an obvious selected side. */
+.top-nav {
+  display: inline-flex;
+  gap: 0.125rem;
+  padding: 0.1875rem;
+  border: 1px solid var(--color-stone);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container);
+}
+
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  height: 1.875rem;
+  padding: 0 0.875rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.nav-tab:hover {
+  color: var(--color-ink);
+}
+
+.nav-tab:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 1px;
+}
+
+.nav-tab.nav-tab-active {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.docs-nav-link.docs-nav-active {
+  background: var(--color-surface-container);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.docs-nav-link.docs-nav-active mat-icon {
+  color: var(--color-signal);
+  opacity: 1;
+}
+
+/* Native spinners crowd a 3.5rem field flanked by prev/next page buttons. */
+.page-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.page-input::-webkit-outer-spin-button,
+.page-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.toolbar-select[aria-expanded='true'] {
+  background-color: var(--color-secondary-container);
+  color: var(--color-secondary-on-container);
+  border-color: var(--color-muted);
+}
+
+.dropdown-menu .option[aria-selected='true'] {
+  background-color: var(--color-secondary-container);
+  color: var(--color-secondary-on-container);
+  font-weight: 600;
+}

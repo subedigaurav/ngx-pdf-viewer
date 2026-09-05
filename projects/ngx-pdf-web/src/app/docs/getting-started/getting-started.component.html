@@ -1,0 +1,237 @@
+<article class="docs-page getting-started-docs" ngxHighlightCode>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/docs">Docs</a>
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-2xs">chevron_right</mat-icon>
+    <span aria-current="page">Getting Started</span>
+  </nav>
+
+  <header class="doc-hero">
+    <h1>Getting Started</h1>
+    <p class="lead">
+      Install the library and render a PDF with the standalone <code>ngx-pdf-viewer</code> component — pdf.js loads
+      automatically from a CDN at runtime.
+    </p>
+  </header>
+
+  <section class="doc-section" id="installation">
+    <h2><span class="step">1</span> Installation</h2>
+    <p>No peer install, no stylesheet to wire up, no worker file to copy.</p>
+    <div class="code-block">
+      <div class="code-head">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">terminal</mat-icon>
+        <span>Install</span>
+      </div>
+      <pre><code class="language-bash">pnpm add &#64;gavsby/ngx-pdf-viewer
+# or
+npm install &#64;gavsby/ngx-pdf-viewer</code></pre>
+    </div>
+    <p>
+      The library is headless and does not ship a custom visual theme — use Angular Material system tokens
+      (<code>--mat-sys-*</code>) and Angular Aria for your chrome.
+    </p>
+    <div class="callout">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">info</mat-icon>
+      <div>
+        <strong>Runtime CDN</strong>
+        <span>
+          pdf.js loads from a CDN by default, so it needs internet access. To go offline or satisfy a strict
+          Content-Security-Policy, serve a copy of the <code>pdfjs-dist</code> package yourself and point
+          <code>cdnBaseUrl</code> at it — every other URL is derived from that one. Individual overrides
+          (<code>workerSrc</code>, <code>cMapsUrl</code>, <code>standardFontDataUrl</code>, <code>wasmUrl</code>,
+          <code>iccUrl</code>) are there for mixed setups.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section" id="usage">
+    <h2><span class="step">2</span> Render a document</h2>
+    <p>
+      Give the host a definite height (flex child or <code>height: 100%</code>). The viewer is
+      <code>position: absolute; inset: 0</code> inside that host.
+    </p>
+    <div class="code-block">
+      <div class="code-head">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">code</mat-icon>
+        <span>document-viewer.component.ts</span>
+      </div>
+      <pre><code class="language-typescript">import {{ '{' }} PdfViewerComponent {{ '}' }} from '@gavsby/ngx-pdf-viewer';
+
+&#64;Component({{ '{' }}
+  selector: 'ngx-document-viewer',
+  standalone: true,
+  imports: [PdfViewerComponent],
+  template: `
+    &lt;ngx-pdf-viewer
+      [src]="pdfSrc"
+      [page]="page"
+      [zoom]="zoom"
+      (afterLoadComplete)="onLoaded($event)"
+      (pageChange)="page = $event"
+      (error)="onError($event)"
+    /&gt;
+  `,
+  styles: [`:host {{ '{' }} display: block; height: 100%; {{ '}' }}`],
+{{ '}' }})
+export class DocumentViewerComponent {{ '{' }}
+  pdfSrc = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
+  page = 1;
+  zoom = 1;
+{{ '}' }}</code></pre>
+    </div>
+    <div class="callout">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">lightbulb</mat-icon>
+      <div>
+        <strong>Sources</strong>
+        <span>
+          <code>[src]</code> accepts a URL string, raw bytes, or a pdf.js parameters object — see below for every
+          format.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section" id="sources">
+    <h2><span class="step">3</span> PDF sources</h2>
+    <p>
+      <code>[src]</code> accepts anything <code>pdfjs-dist</code>'s <code>getDocument()</code> accepts:
+      <code>string | URL | Uint8Array | ArrayBuffer | PDFDocumentParameters</code>. A plain <code>string</code> is
+      always treated as a URL to fetch — decode base64 and Blob sources to bytes first.
+    </p>
+
+    <h3>URL</h3>
+    <p>Same-origin or CORS-enabled remote URLs are fetched directly by the worker.</p>
+    <div class="code-block">
+      <div class="code-head"><span>URL string</span></div>
+      <pre><code class="language-typescript">pdfSrc = 'https://example.com/report.pdf';
+// or same-origin
+pdfSrc = '/assets/report.pdf';</code></pre>
+    </div>
+
+    <h3>Uint8Array / ArrayBuffer</h3>
+    <p>Bytes you already have in memory — a <code>fetch()</code> response, IndexedDB, and so on.</p>
+    <div class="code-block">
+      <div class="code-head"><span>Raw bytes</span></div>
+      <pre><code class="language-typescript">const response = await fetch('/reports/report.pdf');
+this.pdfSrc = new Uint8Array(await response.arrayBuffer());</code></pre>
+    </div>
+
+    <h3>Base64</h3>
+    <p>
+      Decode to bytes before binding — a base64 string passed directly to <code>[src]</code> is read as a URL and will
+      fail to load.
+    </p>
+    <div class="code-block">
+      <div class="code-head"><span>Base64 → Uint8Array</span></div>
+      <pre><code class="language-typescript">function base64ToBytes(base64: string): Uint8Array &#123;
+  const binary = atob(base64);
+  return Uint8Array.from(binary, (c) =&gt; c.charCodeAt(0));
+&#125;
+
+this.pdfSrc = base64ToBytes(base64Pdf);</code></pre>
+    </div>
+
+    <h3>Blob / File</h3>
+    <p>From a <code>&lt;input type="file"&gt;</code> element or a download — convert to bytes the same way.</p>
+    <div class="code-block">
+      <div class="code-head"><span>File input</span></div>
+      <pre><code class="language-typescript">onFileSelected(event: Event) &#123;
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  file.arrayBuffer().then((buf) =&gt; (this.pdfSrc = new Uint8Array(buf)));
+&#125;</code></pre>
+    </div>
+
+    <h3>PDFDocumentParameters</h3>
+    <p>
+      For authenticated requests, a known password, or any other
+      <a
+        href="https://mozilla.github.io/pdf.js/api/draft/module-pdfjsLib.html#~getDocument"
+        target="_blank"
+        rel="noopener"
+        >pdf.js document parameter</a
+      >, pass an object instead of a bare source.
+    </p>
+    <div class="code-block">
+      <div class="code-head"><span>Authenticated request</span></div>
+      <pre><code class="language-typescript">this.pdfSrc = &#123;
+  url: '/reports/report.pdf',
+  httpHeaders: &#123; Authorization: `Bearer $&#123;token&#125;` &#125;,
+  withCredentials: true,
+&#125;;</code></pre>
+    </div>
+  </section>
+
+  <section class="doc-section" id="search">
+    <h2><span class="step">4</span> Search</h2>
+    <p>
+      Call methods on the component instance. Results emit on <code>searchResults</code> as
+      <code>&#123; current, total &#125;</code>.
+    </p>
+    <div class="code-block">
+      <div class="code-head"><span>Search API</span></div>
+      <pre><code class="language-typescript">@ViewChild(PdfViewerComponent) viewer!: PdfViewerComponent;
+
+search(query: string) &#123;
+  this.viewer.search(query);
+&#125;
+
+next() &#123; this.viewer.findNext(); &#125;
+previous() &#123; this.viewer.findPrevious(); &#125;
+clear() &#123; this.viewer.clearSearch(); &#125;</code></pre>
+    </div>
+  </section>
+
+  <section class="doc-section" id="faq">
+    <h2>Troubleshooting</h2>
+    <div ngAccordionGroup [multiExpandable]="true" class="accordion-group">
+      <div class="accordion-item">
+        <button ngAccordionTrigger [panel]="blank" class="accordion-header">
+          The canvas is blank
+          <mat-icon class="icon icon-sm" fontSet="material-symbols-rounded" aria-hidden="true">expand_more</mat-icon>
+        </button>
+        <div ngAccordionPanel #blank="ngAccordionPanel" class="accordion-panel">
+          <ng-template ngAccordionContent>
+            Give the host a non-zero height (flex child or <code>height: 100%</code>). Check the browser console for
+            worker or CORS errors.
+          </ng-template>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button ngAccordionTrigger [panel]="cors" class="accordion-header">
+          Load fails with a network error
+          <mat-icon class="icon icon-sm" fontSet="material-symbols-rounded" aria-hidden="true">expand_more</mat-icon>
+        </button>
+        <div ngAccordionPanel #cors="ngAccordionPanel" class="accordion-panel">
+          <ng-template ngAccordionContent>
+            The PDF URL must allow cross-origin reads. Serve files from your own origin, or enable CORS on the remote
+            host. Passing a <code>Uint8Array</code> avoids CORS entirely.
+          </ng-template>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button ngAccordionTrigger [panel]="password" class="accordion-header">
+          Password-protected PDFs
+          <mat-icon class="icon icon-sm" fontSet="material-symbols-rounded" aria-hidden="true">expand_more</mat-icon>
+        </button>
+        <div ngAccordionPanel #password="ngAccordionPanel" class="accordion-panel">
+          <ng-template ngAccordionContent>
+            Bind <code>[passwordProvider]</code>. It receives a pdf.js password reason code and should return the
+            password string, or <code>null</code> to cancel (<code>PASSWORD_CANCELLED</code>).
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="doc-nav">
+    <a mat-stroked-button routerLink="/docs/overview" class="doc-nav-link doc-nav-prev">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_back</mat-icon>
+      Overview
+    </a>
+    <a mat-stroked-button routerLink="/docs/api" class="doc-nav-link doc-nav-next">
+      API Reference
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_forward</mat-icon>
+    </a>
+  </nav>
+</article>

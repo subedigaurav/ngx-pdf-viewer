@@ -1,0 +1,37 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "paths": {
+      "@gavsby/ngx-pdf-viewer": ["./projects/ngx-pdf-viewer/src/public-api.ts"]
+    },
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/ngx-pdf-viewer/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/ngx-pdf-viewer/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/ngx-pdf-web/tsconfig.app.json"
+    }
+  ]
+}

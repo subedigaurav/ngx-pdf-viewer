@@ -1,0 +1,32 @@
+// Minimal Angular Material system-token theme.
+// Tailwind owns the visual language for our own markup (see styles.css); this
+// file exists only so `mat-icon`, `mat-icon-button`, `mat-flat-button`,
+// `mat-stroked-button` and `matTooltip` resolve the `--mat-sys-*` tokens they
+// read internally.
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$violet-palette,
+      ),
+      typography: (
+        plain-family: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+        brand-family: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+
+  // M3 has no "neutral"/gray option for the primary role — every named
+  // palette is chromatic. Rather than fight a hue we don't want, override
+  // the couple of system tokens Material components actually read (ripple,
+  // focus, icon-button color) to the same near-black accent as the rest of
+  // the site (--color-signal, defined in styles.css).
+  --mat-sys-primary: var(--color-signal);
+  --mat-sys-on-primary: var(--color-signal-on);
+  --mat-sys-primary-container: var(--color-secondary-container);
+  --mat-sys-on-primary-container: var(--color-secondary-on-container);
+}

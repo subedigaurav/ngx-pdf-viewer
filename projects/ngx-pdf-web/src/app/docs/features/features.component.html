@@ -1,0 +1,459 @@
+<article class="docs-page features-docs" ngxHighlightCode>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/docs">Docs</a>
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-2xs">chevron_right</mat-icon>
+    <span aria-current="page">Features</span>
+  </nav>
+
+  <header class="doc-hero">
+    <h1>Features</h1>
+    <p class="lead">
+      Every capability of <code>&lt;ngx-pdf-viewer&gt;</code>, with the exact input, output, or method that drives it.
+      If it isn't on this page, the library doesn't do it — see <a href="#not-included">what it leaves to you</a> at the
+      end.
+    </p>
+  </header>
+
+  <section class="doc-section">
+    <h2>Rendering</h2>
+    <ul class="feature-list">
+      <li>
+        <strong>Canvas page rendering</strong>
+        <span>
+          Real canvas elements in your own DOM — no iframe, no shadow root. Continuous vertical scrolling, with only
+          pages near the viewport drawn and off-screen ones released.
+        </span>
+      </li>
+      <li>
+        <strong>Selectable text layer</strong>
+        <span>
+          Positioned over the canvas so text can be selected, copied and found.
+          <code>renderText</code> toggles it; <code>renderTextMode</code> can defer to the document's own copy
+          permissions.
+        </span>
+      </li>
+      <li>
+        <strong>Annotation layer</strong>
+        <span>
+          Link annotations, sticky notes and popups, plus optional interactive form widgets, via
+          <code>annotationMode</code>.
+        </span>
+      </li>
+      <li>
+        <strong>HiDPI-correct output</strong>
+        <span>
+          Canvases rasterise at <code>devicePixelRatio</code> and are scaled back down in CSS, so pages stay sharp on
+          high-density displays.
+        </span>
+      </li>
+      <li>
+        <strong>Fully restyleable layers</strong>
+        <span>
+          Nothing is encapsulated — override <code>.textLayer</code>, <code>.annotationLayer</code> and
+          <code>.page</code> from your own global CSS, including search highlight colours.
+        </span>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">info</mat-icon>
+      <div>
+        <strong>Layer positioning ships automatically</strong>
+        <span>
+          The text and annotation layers are positioned by <code>pdf_viewer.css</code>, which the library injects from
+          the CDN on first load — no stylesheet to add. It is inserted at the top of <code>&lt;head&gt;</code>, so your
+          own CSS still wins.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section">
+    <h2>Zoom, fit and rotation</h2>
+    <ul class="feature-list">
+      <li>
+        <strong>Three fit modes</strong>
+        <span>
+          <code>zoomScale</code> takes <code>'page-width'</code>, <code>'page-height'</code> or <code>'page-fit'</code>,
+          measured from the container. <code>'page-fit'</code> uses whichever axis is more constraining.
+        </span>
+      </li>
+      <li>
+        <strong>Zoom multiplier</strong>
+        <span>
+          <code>zoom</code> multiplies on top of the fit mode, snapped to 5% increments for predictable steps. Not
+          clamped by the library.
+        </span>
+      </li>
+      <li>
+        <strong>Reading position preserved across zoom</strong>
+        <span>
+          Changing scale keeps you where you were, including the offset <em>within</em> the page — not just the page
+          number.
+        </span>
+      </li>
+      <li>
+        <strong>Natural size</strong>
+        <span> <code>originalSize</code> ignores the container and renders at <code>zoom</code> alone. </span>
+      </li>
+      <li>
+        <strong>Rotation</strong>
+        <span>
+          <code>rotation</code> in degrees, added to each page's intrinsic rotation. Use multiples of 90; the library
+          does not validate it.
+        </span>
+      </li>
+      <li>
+        <strong>Automatic re-fit on resize</strong>
+        <span>
+          <code>autoresize</code> (on by default) recomputes scale on window and host element resize, debounced
+          100&nbsp;ms.
+        </span>
+      </li>
+      <li>
+        <strong>Page borders</strong>
+        <span>
+          <code>showBorders</code> keeps PDF.js's page borders and reserves their width in the fit calculation.
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>Navigation</h2>
+    <ul class="feature-list">
+      <li>
+        <strong>Controlled current page</strong>
+        <span> Set <code>page</code> to navigate; it is clamped to 1…<code>numPages</code>. </span>
+      </li>
+      <li>
+        <strong>Scroll-driven page tracking</strong>
+        <span>
+          <code>pageChange</code> emits as the user scrolls, debounced 100&nbsp;ms. Echoing it straight back into
+          <code>page</code> is the expected pattern and will not fight the scroll.
+        </span>
+      </li>
+      <li>
+        <strong>Stick to page</strong>
+        <span> <code>stickToPage</code> re-asserts the target page once a programmatic navigation settles. </span>
+      </li>
+      <li>
+        <strong>Hand tool</strong>
+        <span><code>enableHandTool</code> gives a grab cursor and drag-to-pan scrolling.</span>
+      </li>
+      <li>
+        <strong>Document outline</strong>
+        <span>
+          <code>getOutline()</code> and the <code>outlineLoaded</code> output expose the bookmark tree;
+          <code>navigateToOutline(item)</code> jumps to an entry's internal destination.
+        </span>
+      </li>
+      <li>
+        <strong>Link handling</strong>
+        <span>
+          Internal links navigate within the document. <code>externalLinkTarget</code> chooses how external ones open —
+          <code>'blank'</code>, <code>'self'</code>, <code>'parent'</code>, <code>'top'</code> or <code>'none'</code>.
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>Search</h2>
+    <ul class="feature-list">
+      <li>
+        <strong>Whole-document search</strong>
+        <span>
+          <code>search(query, options?)</code> runs through PDF.js's find controller, so matches highlight and scroll
+          into view across the entire document — not only rendered pages.
+        </span>
+      </li>
+      <li>
+        <strong>Match navigation</strong>
+        <span><code>findNext()</code>, <code>findPrevious()</code> and <code>clearSearch()</code>.</span>
+      </li>
+      <li>
+        <strong>Live match count</strong>
+        <span>
+          <code>searchResults</code> emits <code>&#123; current, total &#125;</code>, or <code>null</code> when cleared
+          or nothing matched.
+        </span>
+      </li>
+      <li>
+        <strong>Search options</strong>
+        <span> <code>caseSensitive</code>, <code>entireWord</code> and <code>highlightAll</code>. </span>
+      </li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-head">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-2xs">terminal</mat-icon>
+        component.ts
+      </div>
+      <pre><code class="language-typescript">readonly viewer = viewChild(PdfViewerComponent);
+
+search(term: string) &#123;
+  this.viewer()?.search(term, &#123; caseSensitive: false, entireWord: false, highlightAll: true &#125;);
+&#125;</code></pre>
+    </div>
+  </section>
+
+  <section class="doc-section">
+    <h2>Document actions</h2>
+    <ul class="feature-list">
+      <li>
+        <strong>Download</strong>
+        <span>
+          <code>download(filename?)</code> saves the original bytes unchanged. Defaults to <code>document.pdf</code>.
+        </span>
+      </li>
+      <li>
+        <strong>Print</strong>
+        <span>
+          <code>print()</code> prints through a hidden iframe, so output matches the source rather than a re-render.
+        </span>
+      </li>
+      <li>
+        <strong>Thumbnails</strong>
+        <span>
+          <code>getThumbnail(page)</code> returns <code>&#123; url, width, height &#125;</code> — a PNG data URL capped
+          at 150&nbsp;px wide.
+        </span>
+      </li>
+      <li>
+        <strong>Metadata</strong>
+        <span>
+          <code>getMetadata()</code> returns <code>&#123; info, metadata &#125;</code> straight from PDF.js.
+        </span>
+      </li>
+      <li>
+        <strong>Page count</strong>
+        <span>
+          <code>getPageCount()</code> returns <code>0</code> when nothing is loaded — the only one of these that never
+          throws, so it doubles as a readiness guard.
+        </span>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">warning</mat-icon>
+      <div>
+        <strong>Guard these behind a loaded document</strong>
+        <span>
+          <code>download</code>, <code>print</code>, <code>getThumbnail</code>, <code>getMetadata</code> and
+          <code>getOutline</code> reject with <code>PdfViewerError('INVALID_STATE')</code> if called before
+          <code>afterLoadComplete</code> fires.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section">
+    <h2>Loading and lifecycle</h2>
+    <ul class="feature-list">
+      <li>
+        <strong>Lazy initialisation</strong>
+        <span>
+          PDF.js is dynamically imported and the viewer is built only once an
+          <code>IntersectionObserver</code> reports the host on screen. Off-screen viewers cost nothing.
+        </span>
+      </li>
+      <li>
+        <strong>Flexible sources</strong>
+        <span>
+          <code>src</code> accepts a URL string, <code>Uint8Array</code>/<code>ArrayBuffer</code>, a <code>URL</code>,
+          or a full PDF.js parameters object whose options win over the defaults.
+        </span>
+      </li>
+      <li>
+        <strong>Source de-duplication</strong>
+        <span>
+          Re-assigning the same string or the same <code>Uint8Array</code> reference does not reload the document.
+        </span>
+      </li>
+      <li>
+        <strong>Download progress</strong>
+        <span><code>progress</code> emits <code>&#123; loaded, total &#125;</code> while fetching.</span>
+      </li>
+      <li>
+        <strong>Custom loading placeholder</strong>
+        <span><code>loadingTemplate</code> takes your own <code>ng-template</code>.</span>
+      </li>
+      <li>
+        <strong>Password-protected PDFs</strong>
+        <span>
+          <code>passwordProvider</code> is asked for the password; returning <code>null</code> cancels cleanly with
+          <code>PASSWORD_CANCELLED</code> instead of hanging.
+        </span>
+      </li>
+      <li>
+        <strong>Typed errors</strong>
+        <span>
+          Every failure arrives on the <code>error</code> output as a <code>PdfViewerError</code> with a stable
+          <code>code</code>.
+        </span>
+      </li>
+      <li>
+        <strong>SSR safe</strong>
+        <span>
+          Browser-only paths are guarded by <code>isSSR()</code>, which is exported so your own code can branch the same
+          way.
+        </span>
+      </li>
+      <li>
+        <strong>Render lifecycle events</strong>
+        <span>
+          <code>afterLoadComplete</code>, <code>pagesInitialized</code>, <code>pageRendered</code> and
+          <code>textLayerRendered</code>.
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>Reference tables</h2>
+
+    <h3>Text layer modes</h3>
+    <div class="table-wrap">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th scope="col">Value</th>
+            <th scope="col">Numeric</th>
+            <th scope="col">Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>RenderTextMode.DISABLED</code></td>
+            <td><code>0</code></td>
+            <td>No text layer — text cannot be selected or found.</td>
+          </tr>
+          <tr>
+            <td><code>RenderTextMode.ENABLED</code></td>
+            <td><code>1</code></td>
+            <td>Text layer always rendered. The default.</td>
+          </tr>
+          <tr>
+            <td><code>RenderTextMode.ENHANCED</code></td>
+            <td><code>2</code></td>
+            <td>Renders the text layer only when the document permits copying.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted"><code>renderText="false"</code> disables the layer regardless of <code>renderTextMode</code>.</p>
+
+    <h3>Annotation modes</h3>
+    <div class="table-wrap">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th scope="col">Value</th>
+            <th scope="col">Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>'none'</code></td>
+            <td>No annotation layer at all.</td>
+          </tr>
+          <tr>
+            <td><code>'enabled'</code></td>
+            <td>Links, sticky notes and popups. Form fields render flat. The default.</td>
+          </tr>
+          <tr>
+            <td><code>'forms'</code></td>
+            <td>Also renders interactive form widgets (inputs, checkboxes, selects).</td>
+          </tr>
+          <tr>
+            <td><code>'storage'</code></td>
+            <td>As <code>forms</code>, plus PDF.js persists entered values in its annotation storage.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Error codes</h3>
+    <div class="table-wrap">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Raised when</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>INVALID_SOURCE</code></td>
+            <td><code>src</code> is empty or not a recognised source shape.</td>
+          </tr>
+          <tr>
+            <td><code>LOAD_FAILED</code></td>
+            <td>Network, CORS, or a malformed/corrupt PDF.</td>
+          </tr>
+          <tr>
+            <td><code>PASSWORD_REQUIRED</code></td>
+            <td>Encrypted PDF and no <code>passwordProvider</code> bound.</td>
+          </tr>
+          <tr>
+            <td><code>PASSWORD_CANCELLED</code></td>
+            <td>The provider returned <code>null</code> or threw.</td>
+          </tr>
+          <tr>
+            <td><code>INVALID_STATE</code></td>
+            <td>A document method ran before a document finished loading.</td>
+          </tr>
+          <tr>
+            <td><code>RENDER_FAILED</code></td>
+            <td>PDF.js failed while rasterising or scaling a page.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="doc-section" id="not-included">
+    <h2>What this library does not do</h2>
+    <p class="section-intro">
+      It is headless on purpose. The demo's toolbar, search bar and dropdowns are application code built on the API
+      above — they are not part of the package.
+    </p>
+    <ul class="scope-list">
+      <li>
+        <strong>No toolbar or chrome.</strong> No buttons, page field, zoom control or sidebar ship with the component.
+        You build the UI; the viewer renders the document.
+      </li>
+      <li>
+        <strong>No annotation or form editing.</strong> Existing annotations and widgets render, but PDF.js's annotation
+        editor (drawing, highlighting, free text, signatures) is not enabled.
+      </li>
+      <li>
+        <strong>No thumbnail sidebar.</strong> <code>getThumbnail(page)</code> gives you the image; laying out a strip
+        is yours.
+      </li>
+      <li>
+        <strong>No presentation mode, spread view or horizontal scrolling.</strong> Rendering is single-column vertical.
+      </li>
+      <li>
+        <strong>No PDF creation or editing.</strong> Read-only — <code>download()</code> saves the original bytes
+        unchanged.
+      </li>
+      <li>
+        <strong>No bundled CSS for the document.</strong> You add <code>pdf_viewer.css</code> yourself, which is what
+        makes the layers restyleable.
+      </li>
+    </ul>
+  </section>
+
+  <nav class="doc-nav" aria-label="Documentation">
+    <a mat-stroked-button routerLink="/docs/getting-started" class="doc-nav-link">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_back</mat-icon>
+      Getting Started
+    </a>
+    <a mat-stroked-button routerLink="/docs/api" class="doc-nav-link">
+      API Reference
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-xs">arrow_forward</mat-icon>
+    </a>
+  </nav>
+</article>

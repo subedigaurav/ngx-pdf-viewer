@@ -1,0 +1,123 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "pnpm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-pdf-viewer": {
+      "projectType": "library",
+      "root": "projects/ngx-pdf-viewer",
+      "sourceRoot": "projects/ngx-pdf-viewer/src",
+      "prefix": "ngx",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-pdf-viewer/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-pdf-viewer/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/ngx-pdf-viewer/tsconfig.spec.json",
+            "setupFiles": ["projects/ngx-pdf-viewer/src/test-setup.ts"]
+          }
+        }
+      }
+    },
+    "ngx-pdf-web": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "projects/ngx-pdf-web",
+      "sourceRoot": "projects/ngx-pdf-web/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/ngx-pdf-web/src/main.ts",
+            "tsConfig": "projects/ngx-pdf-web/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/ngx-pdf-web/public"
+              }
+            ],
+            "styles": ["projects/ngx-pdf-web/src/material-theme.scss", "projects/ngx-pdf-web/src/styles.css"],
+            "allowedCommonJsDependencies": ["prismjs"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1.05MB",
+                  "maximumError": "1.4MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kB",
+                  "maximumError": "24kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "ngx-pdf-web:build:production"
+            },
+            "development": {
+              "buildTarget": "ngx-pdf-web:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  }
+}

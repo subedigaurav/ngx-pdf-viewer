@@ -1,0 +1,10 @@
+<div #pdfViewerContainer class="ngx-pdf-viewer-container" [attr.aria-busy]="isLoading()">
+  <div class="pdfViewer"></div>
+  @if (isLoading()) {
+    @if (loadingTemplate(); as template) {
+      <ng-container [ngTemplateOutlet]="template" />
+    } @else {
+      <div class="pdf-viewer-loading" role="status" aria-live="polite">Loading document...</div>
+    }
+  }
+</div>

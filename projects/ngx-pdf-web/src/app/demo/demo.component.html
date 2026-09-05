@@ -1,0 +1,520 @@
+<div class="demo-app flex flex-col h-full bg-paper text-ink">
+  <header class="chrome shrink-0 flex flex-col bg-surface border-b border-stone overflow-visible">
+    <div
+      ngToolbar
+      orientation="horizontal"
+      [wrap]="true"
+      class="toolbar flex items-center flex-wrap gap-2.5 p-2 min-h-12"
+      aria-label="PDF viewer toolbar">
+      <div
+        ngToolbarWidgetGroup
+        aria-label="Page navigation"
+        class="toolbar-group inline-flex items-center gap-0.5 h-9 px-1 rounded-md bg-surface-container border border-stone">
+        <button
+          type="button"
+          ngToolbarWidget
+          value="prev-page"
+          mat-icon-button
+          (click)="goToPage(-1)"
+          [disabled]="numPages() === 0"
+          matTooltip="Previous page"
+          aria-label="Previous page"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">navigate_before</mat-icon>
+        </button>
+        <div class="page-field inline-flex items-center gap-1.5 h-7">
+          <input
+            type="number"
+            class="page-input w-14 h-7 px-1.5 text-center bg-paper border border-stone rounded-sm text-xs font-mono font-medium text-ink focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/20 disabled:opacity-50"
+            [ngModel]="page()"
+            (ngModelChange)="onPageInput($event)"
+            min="1"
+            [max]="numPages() || 1"
+            aria-label="Current page"
+            aria-describedby="page-total" />
+          <span id="page-total" class="page-total text-xs font-mono font-medium text-muted whitespace-nowrap pt-0.5"
+            >/ {{ numPages() || '—' }}</span
+          >
+        </div>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="next-page"
+          mat-icon-button
+          (click)="goToPage(1)"
+          [disabled]="numPages() === 0"
+          matTooltip="Next page"
+          aria-label="Next page"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">navigate_next</mat-icon>
+        </button>
+      </div>
+
+      <span
+        class="toolbar-divider h-5 w-px bg-stone mx-1.5 shrink-0 self-center hidden sm:block"
+        aria-hidden="true"></span>
+
+      <div
+        ngToolbarWidgetGroup
+        aria-label="Zoom"
+        class="toolbar-group inline-flex items-center gap-0.5 h-9 px-1 rounded-md bg-surface-container border border-stone">
+        <button
+          type="button"
+          ngToolbarWidget
+          value="zoom-out"
+          mat-icon-button
+          (click)="zoomBy(-0.1)"
+          [disabled]="!canZoomOut()"
+          matTooltip="Zoom out"
+          aria-label="Zoom out"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">remove</mat-icon>
+        </button>
+        <span
+          class="zoom-value inline-flex items-center justify-center min-w-14 h-7 px-1.5 text-xs font-mono font-medium tabular-nums text-ink bg-paper border border-stone rounded-sm whitespace-nowrap"
+          aria-live="polite"
+          aria-atomic="true"
+          >{{ zoomPercent() }}%</span
+        >
+        <button
+          type="button"
+          ngToolbarWidget
+          value="zoom-in"
+          mat-icon-button
+          (click)="zoomBy(0.1)"
+          [disabled]="!canZoomIn()"
+          matTooltip="Zoom in"
+          aria-label="Zoom in"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">add</mat-icon>
+        </button>
+      </div>
+
+      <div class="select-wrap relative inline-flex items-center h-9">
+        <div
+          ngCombobox
+          ngToolbarWidget
+          value="scale-select"
+          #scaleSelect="ngCombobox"
+          [(expanded)]="scaleOpen"
+          class="toolbar-select inline-flex items-center justify-between gap-2 h-9 w-36 px-2 py-1.5 bg-surface-container border border-stone rounded-sm text-sm font-medium text-ink cursor-pointer whitespace-nowrap transition-colors"
+          aria-label="Scale mode">
+          <span class="flex-1 min-w-0 truncate text-left">{{ zoomScaleLabel() }}</span>
+          <mat-icon
+            fontSet="material-symbols-rounded"
+            aria-hidden="true"
+            class="text-muted shrink-0 icon-xs transition-transform"
+            [class.rotate-180]="scaleOpen()"
+            >expand_more</mat-icon
+          >
+        </div>
+        <ng-template ngComboboxPopup [combobox]="scaleSelect">
+          <ul
+            ngComboboxWidget
+            ngListbox
+            #scaleList="ngListbox"
+            [value]="zoomScaleSelection()"
+            (valueChange)="commitScale($event)"
+            [activeDescendant]="scaleList.activeDescendant()"
+            class="dropdown-menu absolute z-30 top-full mt-1.5 left-0 min-w-full p-1 list-none bg-surface-container border border-stone rounded-md shadow-md">
+            @for (opt of zoomScales; track opt.value) {
+              <li
+                ngOption
+                [value]="opt.value"
+                [label]="opt.label"
+                class="option px-2.5 py-1.5 rounded-sm text-sm text-ink cursor-pointer outline-none hover:bg-surface-container-high focus:bg-surface-container-high focus-visible:bg-surface-container-high">
+                {{ opt.label }}
+              </li>
+            }
+          </ul>
+        </ng-template>
+      </div>
+
+      <button
+        type="button"
+        ngToolbarWidget
+        value="rotate"
+        mat-icon-button
+        (click)="rotateClockwise()"
+        [disabled]="numPages() === 0"
+        matTooltip="Rotate clockwise"
+        aria-label="Rotate clockwise"
+        class="tb-btn">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">rotate_right</mat-icon>
+      </button>
+
+      <span
+        class="toolbar-divider h-5 w-px bg-stone mx-1.5 shrink-0 self-center hidden sm:block"
+        aria-hidden="true"></span>
+
+      <div
+        ngToolbarWidgetGroup
+        [multi]="true"
+        aria-label="View options"
+        class="toolbar-group inline-flex items-center gap-0.5 h-9 px-1 rounded-md bg-surface-container border border-stone">
+        <button
+          type="button"
+          ngToolbarWidget
+          value="size"
+          mat-icon-button
+          [attr.aria-pressed]="originalSize()"
+          (click)="originalSize.set(!originalSize())"
+          matTooltip="Original size"
+          aria-label="Original size"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm"
+            >photo_size_select_actual</mat-icon
+          >
+        </button>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="fit"
+          mat-icon-button
+          [attr.aria-pressed]="fitToPage()"
+          (click)="fitToPage.set(!fitToPage())"
+          matTooltip="Fit to page"
+          aria-label="Fit to page"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">aspect_ratio</mat-icon>
+        </button>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="borders"
+          mat-icon-button
+          [attr.aria-pressed]="showBorders()"
+          (click)="showBorders.set(!showBorders())"
+          matTooltip="Show borders"
+          aria-label="Show borders"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">border_outer</mat-icon>
+        </button>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="stick"
+          mat-icon-button
+          [attr.aria-pressed]="stickToPage()"
+          (click)="stickToPage.set(!stickToPage())"
+          matTooltip="Stick to page"
+          aria-label="Stick to page"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">push_pin</mat-icon>
+        </button>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="hand"
+          mat-icon-button
+          [attr.aria-pressed]="enableHandTool()"
+          (click)="enableHandTool.set(!enableHandTool())"
+          matTooltip="Hand tool"
+          aria-label="Hand tool"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">pan_tool_alt</mat-icon>
+        </button>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="text"
+          mat-icon-button
+          [attr.aria-pressed]="renderText()"
+          (click)="renderText.set(!renderText())"
+          matTooltip="Render text layer"
+          aria-label="Render text layer"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">text_fields</mat-icon>
+        </button>
+        <button
+          type="button"
+          ngToolbarWidget
+          value="resize"
+          mat-icon-button
+          [attr.aria-pressed]="autoresize()"
+          (click)="autoresize.set(!autoresize())"
+          matTooltip="Auto-resize"
+          aria-label="Auto-resize"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">autorenew</mat-icon>
+        </button>
+      </div>
+
+      @if (renderText()) {
+        <div class="select-wrap relative inline-flex items-center h-9 ml-1">
+          <div
+            ngCombobox
+            ngToolbarWidget
+            value="mode-select"
+            #modeSelect="ngCombobox"
+            [(expanded)]="modeOpen"
+            class="toolbar-select inline-flex items-center justify-between gap-2 h-9 w-36 px-2 py-1.5 bg-surface-container border border-stone rounded-sm text-sm font-medium text-ink cursor-pointer whitespace-nowrap transition-colors"
+            aria-label="Text layer mode">
+            <span class="flex-1 min-w-0 truncate text-left">{{ renderTextModeLabel() }}</span>
+            <mat-icon
+              fontSet="material-symbols-rounded"
+              aria-hidden="true"
+              class="text-muted shrink-0 icon-xs transition-transform"
+              [class.rotate-180]="modeOpen()"
+              >expand_more</mat-icon
+            >
+          </div>
+          <ng-template ngComboboxPopup [combobox]="modeSelect">
+            <ul
+              ngComboboxWidget
+              ngListbox
+              #modeList="ngListbox"
+              [value]="renderTextModeSelection()"
+              (valueChange)="commitTextMode($event)"
+              [activeDescendant]="modeList.activeDescendant()"
+              class="dropdown-menu absolute z-30 top-full mt-1.5 left-0 min-w-full p-1 list-none bg-surface-container border border-stone rounded-md shadow-md">
+              @for (opt of renderTextModes; track opt.value) {
+                <li
+                  ngOption
+                  [value]="opt.value"
+                  [label]="opt.label"
+                  class="option px-2.5 py-1.5 rounded-sm text-sm text-ink cursor-pointer outline-none hover:bg-surface-container-high focus:bg-surface-container-high focus-visible:bg-surface-container-high">
+                  {{ opt.label }}
+                </li>
+              }
+            </ul>
+          </ng-template>
+        </div>
+      }
+
+      <div class="select-wrap relative inline-flex items-center h-9 ml-1">
+        <div
+          ngCombobox
+          ngToolbarWidget
+          value="links-select"
+          #linksSelect="ngCombobox"
+          [(expanded)]="linksOpen"
+          class="toolbar-select inline-flex items-center justify-between gap-2 h-9 w-36 px-2 py-1.5 bg-surface-container border border-stone rounded-sm text-sm font-medium text-ink cursor-pointer whitespace-nowrap transition-colors"
+          aria-label="Link target">
+          <span class="flex-1 min-w-0 truncate text-left">{{ linkTargetLabel() }}</span>
+          <mat-icon
+            fontSet="material-symbols-rounded"
+            aria-hidden="true"
+            class="text-muted shrink-0 icon-xs transition-transform"
+            [class.rotate-180]="linksOpen()"
+            >expand_more</mat-icon
+          >
+        </div>
+        <ng-template ngComboboxPopup [combobox]="linksSelect">
+          <ul
+            ngComboboxWidget
+            ngListbox
+            #linksList="ngListbox"
+            [value]="linkTargetSelection()"
+            (valueChange)="commitLinkTarget($event)"
+            [activeDescendant]="linksList.activeDescendant()"
+            class="dropdown-menu absolute z-30 top-full mt-1.5 left-0 min-w-full p-1 list-none bg-surface-container border border-stone rounded-md shadow-md">
+            @for (opt of linkTargets; track opt.value) {
+              <li
+                ngOption
+                [value]="opt.value"
+                [label]="opt.label"
+                class="option px-2.5 py-1.5 rounded-sm text-sm text-ink cursor-pointer outline-none hover:bg-surface-container-high focus:bg-surface-container-high focus-visible:bg-surface-container-high">
+                {{ opt.label }}
+              </li>
+            }
+          </ul>
+        </ng-template>
+      </div>
+
+      <span
+        class="toolbar-divider h-5 w-px bg-stone mx-1.5 shrink-0 self-center hidden sm:block"
+        aria-hidden="true"></span>
+
+      <button
+        type="button"
+        ngToolbarWidget
+        value="search"
+        mat-icon-button
+        [attr.aria-pressed]="searchOpen()"
+        (click)="toggleSearch()"
+        matTooltip="Search"
+        aria-label="Search in document"
+        class="tb-btn">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">search</mat-icon>
+      </button>
+      <button
+        type="button"
+        ngToolbarWidget
+        value="download"
+        mat-icon-button
+        (click)="download()"
+        [disabled]="!hasDocument()"
+        matTooltip="Download"
+        aria-label="Download PDF"
+        class="tb-btn">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">download</mat-icon>
+      </button>
+      <button
+        type="button"
+        ngToolbarWidget
+        value="print"
+        mat-icon-button
+        (click)="print()"
+        [disabled]="!hasDocument()"
+        matTooltip="Print"
+        aria-label="Print PDF"
+        class="tb-btn">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">print</mat-icon>
+      </button>
+    </div>
+
+    @if (error(); as err) {
+      <div
+        class="toolbar-status flex items-center gap-2 px-4 py-2 min-h-9 text-sm font-medium text-error bg-error/10 border-y border-error/20 animate-slide-down"
+        role="alert"
+        aria-live="assertive">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm shrink-0">error</mat-icon>
+        <span class="status-error overflow-hidden text-ellipsis whitespace-nowrap font-medium" [title]="err">{{
+          err
+        }}</span>
+      </div>
+    }
+
+    @if (searchOpen()) {
+      <div
+        class="search-row flex items-center gap-2 px-4 py-1.5 min-h-10 border-t border-stone bg-surface-container-low text-muted"
+        role="search"
+        aria-label="Search in document">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm shrink-0 text-muted"
+          >search</mat-icon
+        >
+        <input
+          #searchInput
+          type="text"
+          class="search-input flex-1 max-w-[16rem] h-8 px-3 bg-paper border border-stone rounded-sm text-sm text-ink placeholder:text-muted focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/10"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchQueryChange($event)"
+          (keydown)="onSearchKeydown($event)"
+          placeholder="Search in document…"
+          aria-label="Search in document" />
+        @if (searchResultLabel(); as label) {
+          <span
+            class="search-count inline-flex items-center h-6 px-2 font-mono text-xs font-semibold tracking-wider text-muted bg-surface-container border border-stone rounded-sm whitespace-nowrap"
+            aria-live="polite"
+            >{{ label }}</span
+          >
+        }
+        <button
+          type="button"
+          mat-icon-button
+          (click)="findPrevious()"
+          [disabled]="!searchQuery().trim()"
+          aria-label="Previous match"
+          matTooltip="Previous match"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">keyboard_arrow_up</mat-icon>
+        </button>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="findNext()"
+          [disabled]="!searchQuery().trim()"
+          aria-label="Next match"
+          matTooltip="Next match"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">keyboard_arrow_down</mat-icon>
+        </button>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="toggleSearch()"
+          aria-label="Close search"
+          matTooltip="Close search"
+          class="tb-btn">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true" class="icon-sm">close</mat-icon>
+        </button>
+      </div>
+    }
+
+    <div
+      class="source-row flex items-center gap-3 px-4 py-2 min-h-11 border-t border-stone bg-surface-container-low flex-wrap">
+      <div class="url-field flex items-center gap-2 flex-1 w-full h-8">
+        <mat-icon class="url-icon text-muted shrink-0 icon-sm" fontSet="material-symbols-rounded" aria-hidden="true"
+          >description</mat-icon
+        >
+        <input
+          id="pdf-url"
+          type="url"
+          class="url-input flex-1 min-w-0 h-8 px-3 bg-paper border border-stone rounded-sm text-sm font-mono text-ink placeholder:text-muted focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal/10"
+          [ngModel]="urlDraft()"
+          (ngModelChange)="urlDraft.set($event)"
+          (keydown.enter)="applyPdfUrl()"
+          placeholder="PDF URL"
+          aria-label="PDF URL"
+          aria-describedby="url-hint" />
+        <button type="button" mat-flat-button class="url-load tb-action" (click)="applyPdfUrl()">Load</button>
+        <button type="button" mat-stroked-button class="tb-action" (click)="loadSamplePdf()">Sample</button>
+      </div>
+      <span id="url-hint" class="source-hint text-xs font-normal text-muted whitespace-nowrap hidden sm:inline"
+        >Paste a CORS-enabled PDF URL, then press Load</span
+      >
+    </div>
+  </header>
+
+  <div class="main flex-1 flex flex-col min-h-0 overflow-hidden bg-background">
+    <main class="viewer-area flex-1 min-w-0 flex flex-col bg-viewer" [attr.aria-busy]="isLoading()">
+      <div class="viewer-wrapper flex-1 min-h-0 relative overflow-hidden">
+        <ng-template #pdfLoading>
+          <div class="loading-state fixed inset-0 z-10 grid place-items-center p-6" role="status" aria-live="polite">
+            <div
+              class="loading-card flex flex-col items-center gap-3 w-full max-w-56 p-5 bg-surface-container border border-stone rounded-xl shadow-md text-center">
+              <mat-icon
+                class="loading-spinner icon-lg text-signal animate-spin"
+                fontSet="material-symbols-rounded"
+                aria-hidden="true"
+                >progress_activity</mat-icon
+              >
+              <div class="loading-copy flex flex-col gap-1">
+                <strong class="text-sm font-semibold text-ink">Loading document</strong>
+                @if (progressPercent(); as pct) {
+                  <span class="text-xs font-mono text-muted">{{ pct }}% downloaded</span>
+                } @else {
+                  <span class="text-xs font-mono text-muted">Preparing the PDF viewer</span>
+                }
+              </div>
+              <div
+                class="loading-progress w-full max-w-36 h-0.5 overflow-hidden bg-surface-container-high rounded-sm"
+                role="progressbar"
+                aria-label="PDF loading progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-valuenow]="progressPercent() ?? 0"
+                [attr.aria-valuetext]="progressPercent() ? progressPercent() + '%' : 'loading'">
+                <span
+                  class="block h-full bg-signal rounded-sm transition-all duration-150"
+                  [style.width.%]="progressPercent() ?? 12"></span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        <ngx-pdf-viewer
+          [src]="pdfSrc()"
+          [page]="page()"
+          [renderText]="renderText()"
+          [renderTextMode]="renderTextMode()"
+          [originalSize]="originalSize()"
+          [stickToPage]="stickToPage()"
+          [zoom]="zoom()"
+          [zoomScale]="zoomScale()"
+          [rotation]="rotation()"
+          [autoresize]="autoresize()"
+          [fitToPage]="fitToPage()"
+          [showBorders]="showBorders()"
+          [enableHandTool]="enableHandTool()"
+          [externalLinkTarget]="externalLinkTarget()"
+          [loadingTemplate]="pdfLoading"
+          (afterLoadComplete)="onLoadComplete($event)"
+          (pageChange)="onPageChange($event)"
+          (progress)="onProgress($event)"
+          (error)="onError($event)"
+          (searchResults)="onSearchResults($event)" />
+      </div>
+    </main>
+  </div>
+</div>
