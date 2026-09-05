@@ -9,15 +9,14 @@ permissions:
   id-token: write
 
 env:
-  NODE_VERSION: '22'
-  PNPM_VERSION: '10'
+  NODE_VERSION: '24'
 
 jobs:
   publish:
     name: Verify tag and publish package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -37,17 +36,16 @@ jobs:
             exit 1
           fi
 
-      - uses: pnpm/action-setup@v4
-        with: { version: '${{ env.PNPM_VERSION }}' }
-
-      - uses: actions/setup-node@v4
+      - uses: pnpm/setup@v2
         with:
-          node-version: '${{ env.NODE_VERSION }}'
-          cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@gavsby'
+          runtime: 'node@${{ env.NODE_VERSION }}'
+          cache: true
 
-      - run: pnpm install --frozen-lockfile
+      - name: Configure npm registry auth
+        run: |
+          echo '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' > ~/.npmrc
+          echo '@gavsby:registry=https://registry.npmjs.org/' >> ~/.npmrc
+
       - run: pnpm run verify
 
       - name: Publish to npm

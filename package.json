@@ -19,9 +19,8 @@
     "ng": "ng"
   },
   "private": false,
-  "packageManager": "pnpm@10.29.3",
+  "packageManager": "pnpm@12.3.4",
   "dependencies": {
-    "@angular/animations": "^22.1.4",
     "@angular/aria": "^22.1.4",
     "@angular/cdk": "^22.1.4",
     "@angular/common": "^22.1.4",
