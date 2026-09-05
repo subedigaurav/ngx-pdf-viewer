@@ -1,7 +1,7 @@
 {
   "name": "@gavsby/ngx-pdf-viewer",
   "version": "1.0.0",
-  "description": "Headless, signal-based PDF viewer component for Angular powered by PDF.js.",
+  "description": "Lightweight PDF viewer for Angular powered by PDF.js.",
   "keywords": [
     "angular",
     "pdf",

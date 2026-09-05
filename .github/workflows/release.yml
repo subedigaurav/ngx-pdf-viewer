@@ -27,11 +27,17 @@ jobs:
       - name: Pack npm tarball
         run: npm pack ./dist/ngx-pdf-viewer
 
+      - name: Extract release notes
+        id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v3
+        with:
+          changelog_file: CHANGELOG.md
+
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
           name: ${{ github.ref_name }}
-          body_path: ./RELEASE_NOTES.md
+          body: ${{ steps.extract-release-notes.outputs.release_notes }}
           draft: false
           prerelease: false
           files: '*.tgz'
