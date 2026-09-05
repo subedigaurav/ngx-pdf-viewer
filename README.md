@@ -1,6 +1,6 @@
 # ngx-pdf-viewer
 
-[![Deploy Docs](https://github.com/subedigaurav/ngx-pdf-viewer/actions/workflows/github-pages.yml/badge.svg)](https://github.com/subedigaurav/ngx-pdf-viewer/actions/workflows/github-pages.yml)
+[![Deploy Docs](https://github.com/subedigaurav/ngx-pdf-viewer/actions/workflows/pages.yml/badge.svg)](https://github.com/subedigaurav/ngx-pdf-viewer/actions/workflows/pages.yml)
 [![Angular](https://img.shields.io/badge/Angular-21+-DD0031?logo=angular)](https://angular.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-14b8a6.svg)](#license)
