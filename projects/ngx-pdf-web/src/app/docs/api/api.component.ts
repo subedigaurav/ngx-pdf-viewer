@@ -8,7 +8,17 @@ import { HighlightCodeDirective } from '../shared/highlight-code.directive';
 @Component({
   selector: 'ngx-api',
   standalone: true,
-  imports: [RouterLink, MatButtonModule, MatIconModule, Tabs, TabList, Tab, TabPanel, TabContent, HighlightCodeDirective],
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    MatIconModule,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanel,
+    TabContent,
+    HighlightCodeDirective,
+  ],
   templateUrl: './api.component.html',
   styles: [':host { display: block; }'],
 })
